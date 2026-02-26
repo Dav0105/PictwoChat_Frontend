@@ -1,65 +1,15 @@
-import { useState } from 'react'
-import { Box, Typography, Button, Container } from '@mui/material'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { colors, letterColors } from './theme'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Register from './pages/Register'
 
 function App() {
-
-  const title = "PictwoChat"
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-
-      <Container maxWidth="md">
-
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-
-          {/* https://codeconvey.com/text-wave-effect-css/ */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
-            {title.split('').map((letter, index) => (
-              <Box
-                key={index}
-                component="span"
-                sx={{
-                  fontSize: { xs: '3rem', md: '5rem' },
-                  fontWeight: 'bold',
-                  color: letterColors[index % 3],
-                  display: 'inline-block',
-                  animation: 'wave 1.5s ease-in-out infinite',
-                  animationDelay: `${index * 0.1}s`,
-                  '@keyframes wave': {
-                    '0%, 100%': { transform: 'translateY(0)' },
-                    '50%': { transform: 'translateY(-15px)' },
-                  },
-                }}
-              >
-                {letter === ' ' ? '\u00A0' : letter}
-              </Box>
-            ))}
-          </Box>
-
-          <Box sx={{
-            width: '600px',
-            height: '400px',
-            backgroundColor: 'white',
-            border: '2px solid #1a1a1a',
-            borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
-            boxShadow: '3px 3px 0px #1a1a1a',
-            mx: 'auto',
-          }}>
-        </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: { xs: '100%', sm: '400px' }, mx: 'auto', mt: '30px' }}>
-            <Button variant="contained" sx={{ width: '100%' }}>Login</Button>
-            <Button variant="contained" color="secondary" sx={{ width: '100%' }}>Register</Button>
-          </Box>
-
-
-        </Box>
-      </Container>
-    </Box>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
