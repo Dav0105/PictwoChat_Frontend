@@ -12,6 +12,12 @@ export const colors = {
   success: '#A1BC98',
 }
 
+export const letterColors: Array<string> = [
+    '#A7AAE1',
+    '#F5D3C4',
+    '#F2AEBB',
+]
+
 const theme = createTheme({
   palette: {
     primary: { main: colors.primary },

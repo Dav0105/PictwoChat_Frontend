@@ -3,24 +3,11 @@ import { Box, Typography, Button, Container } from '@mui/material'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { colors } from './theme'
-
-
+import { colors, letterColors } from './theme'
 
 function App() {
-  const letterColors: Array<string> = [
-    colors.primary,   // P
-    colors.secondary, // i
-    colors.error,     // c
-    colors.warning,   // t
-    colors.info,      // o
-    colors.success,   // C
-    colors.primary,   // h
-    colors.secondary, // a
-    colors.error,     // t
-  ]
 
-  const title = "PictoChat"
+  const title = "PictwoChat"
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
@@ -38,7 +25,7 @@ function App() {
                 sx={{
                   fontSize: { xs: '3rem', md: '5rem' },
                   fontWeight: 'bold',
-                  color: letterColors[index],
+                  color: letterColors[index % 3],
                   display: 'inline-block',
                   animation: 'wave 1.5s ease-in-out infinite',
                   animationDelay: `${index * 0.1}s`,
