@@ -18,6 +18,12 @@ export const letterColors: Array<string> = [
     '#F2AEBB',
 ]
 
+export const sketchStyle = {
+  border: '2px solid #1a1a1a',
+  borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
+  boxShadow: '3px 3px 0px #1a1a1a',
+}
+
 const theme = createTheme({
   palette: {
     primary: { main: colors.primary },
