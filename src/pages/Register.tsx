@@ -18,7 +18,7 @@ function Register() {
     }}>
 
       {/* Bouton retour en haut à droite */}
-      <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, right: 16 }}>
+      <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
         <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
           Back
         </Button>
