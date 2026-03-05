@@ -51,15 +51,18 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          border: '2px solid black',
-          borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
-          boxShadow: '3px 3px 0px black',
-          textTransform: 'none',
-          fontWeight: 'bold',
+          ...sketchStyle,
           '&:hover': {
             boxShadow: '1px 1px 0px black',
             transform: 'translate(2px, 2px)',
           },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+        ...sketchStyle
         },
       },
     },

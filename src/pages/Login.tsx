@@ -39,13 +39,6 @@ function Login() {
             type="email"
             variant="outlined"
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                ...sketchStyle,
-                '&:hover fieldset': { borderColor: 'transparent' },
-                '& fieldset': { border: 'none' },
-              }
-            }}
           />
 
           <TextField
@@ -53,14 +46,6 @@ function Login() {
             type="password"
             variant="outlined"
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                ...sketchStyle,
-                '&:hover fieldset': { borderColor: 'transparent' },
-                '& fieldset': { border: 'none' },
-              }
-            }}
-
           />
 
           <Button variant="contained" sx={{ width: '100%', mt: 1 }}>
