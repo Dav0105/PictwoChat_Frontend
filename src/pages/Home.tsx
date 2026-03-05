@@ -45,9 +45,11 @@ function Home() {
           <DrawBox width={"600px"} height={"400px"}/>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: { xs: '100%', sm: '400px' }, mx: 'auto', mt: '30px' }}>
-            <Button variant="contained" sx={{ width: '100%' }}>
-              Login
-            </Button>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <Button variant="contained" sx={{ width: '100%' }}>
+                Login
+              </Button>
+            </Link>
             <Link to="/register" style={{ textDecoration: 'none' }}>
               <Button variant="contained" color="secondary" sx={{ width: '100%' }}>
                 Register
