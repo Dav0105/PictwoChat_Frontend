@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
 
-// Style "dessin" réutilisé depuis votre thème — même ombre, mêmes bordures irrégulières
-
-
 function Register() {
   return (
     <Box sx={{
@@ -16,8 +13,6 @@ function Register() {
       position: 'relative',
       backgroundColor: 'background.default',
     }}>
-
-      {/* Bouton retour en haut à droite */}
       <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
         <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
           Back
@@ -42,28 +37,13 @@ function Register() {
             label="Username"
             variant="outlined"
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                ...sketchStyle,
-                '&:hover fieldset': { borderColor: 'transparent' },
-                '& fieldset': { border: 'none' },
-              }
-            }}
           />
 
-          {/* Champ email */}
           <TextField
             label="Email"
             type="email"
             variant="outlined"
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                ...sketchStyle,
-                '&:hover fieldset': { borderColor: 'transparent' },
-                '& fieldset': { border: 'none' },
-              }
-            }}
           />
 
           <TextField
@@ -71,14 +51,6 @@ function Register() {
             type="password"
             variant="outlined"
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                ...sketchStyle,
-                '&:hover fieldset': { borderColor: 'transparent' },
-                '& fieldset': { border: 'none' },
-              }
-            }}
-
           />
 
           <Button variant="contained" sx={{ width: '100%', mt: 1 }}>
