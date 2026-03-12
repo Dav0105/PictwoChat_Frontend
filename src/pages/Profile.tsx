@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
 import { Box, Typography, Button, Container, TextField, Avatar } from '@mui/material'
 import { Link } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
+import { useRef } from 'react'
 
 function Profile() {
+    const inputRef = useRef(null)
     return (
         <Box sx={{
             display: 'flex',
@@ -60,9 +61,20 @@ function Profile() {
         />
 
 
-        <Button variant="contained" color="secondary" sx={{mt: 1 }}>
-        Upload
-        </Button>
+       <Button
+      variant="contained"
+      color="secondary"
+      onClick={() => inputRef.current.click()}
+    >
+      Upload
+    </Button>
+    <input
+      type="file"
+      ref={inputRef}
+      onChange={(e) => console.log(e.target.files)}
+      style={{ display: 'none' }}
+      accept="image/*"
+    />
 
         </Box>
 
@@ -112,10 +124,6 @@ function Profile() {
         />
 
         </Box>
-
-
-
-
         </Box>
 
         <Box sx={{
