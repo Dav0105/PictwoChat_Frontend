@@ -6,7 +6,7 @@ export const colors = {
   secondary: '#CCD3CA',
   background_default: '#F5E8DD',
   background_paper: '#FFF8F3',
-  error: '#EED3D9',
+  error: '#B21807',
   warning: '#FAB95B',
   info: '#AAC4F5',
   success: '#A1BC98',
