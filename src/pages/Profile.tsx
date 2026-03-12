@@ -2,10 +2,18 @@ import { Box, Typography, Button, Container, TextField, Avatar } from '@mui/mate
 import { Link } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
-import { useRef } from 'react'
+import { useState, useRef } from 'react'
 
 function Profile() {
+
+    const [avatar, setAvatar] = useState(null)
     const inputRef = useRef(null)
+
+    function handleChange(e) {
+        const file = e.target.files[0]
+        if (!file) return
+        setAvatar(URL.createObjectURL(file))
+    }
     return (
         <Box sx={{
             display: 'flex',
@@ -36,46 +44,30 @@ function Profile() {
         Profile settings
         </Typography>
 
-             <TextField
+        <TextField
         label="Name"
         defaultValue={"John Doe"}
         fullWidth
         />
 
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 3,
-            minWidth: '100%',
-            alignItems: 'center',
-        }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, alignItems: 'center' }}>
+        <Avatar src={avatar} sx={{ width: 70, height: 70 }}>H</Avatar>
 
-
-
-        <Avatar sx={{ width: 70, height: 70 }}>H</Avatar>
-
-
-        <TextField
-        label="link"
-        fullWidth
+        <input
+        type="file"
+        ref={inputRef}
+        onChange={handleChange}
+        style={{ display: 'none' }}
+        accept="image/*"
         />
 
-
-       <Button
-      variant="contained"
-      color="secondary"
-      onClick={() => inputRef.current.click()}
-    >
-      Upload
-    </Button>
-    <input
-      type="file"
-      ref={inputRef}
-      onChange={(e) => console.log(e.target.files)}
-      style={{ display: 'none' }}
-      accept="image/*"
-    />
-
+        <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => inputRef.current.click()}
+        >
+        Upload
+        </Button>
         </Box>
 
 
