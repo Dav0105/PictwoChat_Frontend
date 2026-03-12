@@ -3,6 +3,8 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Rooms from './pages/Rooms'
+import Chat from './pages/Chat'
+
 
 function App() {
   return (
@@ -12,6 +14,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </BrowserRouter>
   )
