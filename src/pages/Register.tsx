@@ -2,8 +2,18 @@ import { Box, Typography, Button, Container, TextField } from '@mui/material'
 import { Link } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
+import { REGISTER } from '../graphql/auth.ts'
+import { useMutation } from '@apollo/client/react'
+import { useState } from 'react'
 
 function Register() {
+
+  const [register, { data, loading, error }] = useMutation(REGISTER);
+
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
   return (
     <Box sx={{
       display: 'flex',
@@ -35,6 +45,8 @@ function Register() {
 
           <TextField
             label="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             variant="outlined"
             fullWidth
           />
@@ -42,6 +54,8 @@ function Register() {
           <TextField
             label="Email"
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             variant="outlined"
             fullWidth
           />
@@ -49,11 +63,13 @@ function Register() {
           <TextField
             label="Password"
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             variant="outlined"
             fullWidth
           />
 
-          <Button variant="contained" sx={{ width: '100%', mt: 1 }}>
+          <Button variant="contained" sx={{ width: '100%', mt: 1 }} onClick={() => register({ variables: { email, username, password_hash: password } }) }>
             Create account
           </Button>
 
