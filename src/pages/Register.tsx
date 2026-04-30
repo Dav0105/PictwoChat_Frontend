@@ -1,18 +1,45 @@
 import { Box, Typography, Button, Container, TextField } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
+
 import { REGISTER } from '../graphql/auth.ts'
+import type { RegisterResponse, RegisterVariables } from '../graphql/auth.ts'
+
 import { useMutation } from '@apollo/client/react'
 import { useState } from 'react'
 
-function Register() {
 
-  const [register, { data, loading, error }] = useMutation(REGISTER);
+
+function Register() {
+  const navigate = useNavigate()
+
+  const [register, { data, loading, error }] = useMutation<RegisterResponse, RegisterVariables>(REGISTER);
 
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const handleRegister = async () => {
+    try {
+      const result = await register({
+        variables: {
+          email,
+          username,
+          password_hash: password,
+        }
+      })
+
+      const token = result.data?.register?.token
+      if (token) {
+        localStorage.setItem('token', token)
+        navigate('/rooms')
+      }
+    }
+    catch {
+      // handle errors
+    }
+  }
 
   return (
     <Box sx={{
@@ -69,8 +96,14 @@ function Register() {
             fullWidth
           />
 
-          <Button variant="contained" sx={{ width: '100%', mt: 1 }} onClick={() => register({ variables: { email, username, password_hash: password } }) }>
-            Create account
+          {error && (
+            <Typography color="error" variant="body2">
+              {error.message}
+            </Typography>
+          )}
+
+          <Button variant="contained" sx={{ width: '100%', mt: 1 }} onClick={handleRegister} disabled={loading}>
+            {loading ? 'Registering in...' : 'Create your account'}
           </Button>
 
           <Typography variant="body2" textAlign="center" color="text.secondary">

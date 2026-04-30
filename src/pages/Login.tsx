@@ -1,18 +1,39 @@
 import { Box, Typography, Button, Container, TextField } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { sketchStyle } from '../theme'
+
 import { LOGIN } from '../graphql/auth.ts'
+import type { LoginResponse, LoginVariables } from '../graphql/auth.ts'
+
 import { useMutation } from '@apollo/client/react'
 import { useState } from 'react'
 
 function Login() {
-
-  const [login, { data, loading, error }] = useMutation(LOGIN);
-
+  const navigate = useNavigate()
+  const [login, { loading, error }] = useMutation<LoginResponse, LoginVariables>(LOGIN)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const handleLogin = async () => {
+    try {
+      const result = await login({
+        variables: {
+          email,
+          password_hash: password,
+        }
+      })
+
+      const token = result.data?.login?.token
+      if (token) {
+        localStorage.setItem('token', token)
+        navigate('/rooms')
+      }
+    }
+    catch {
+      // handle errors
+    }
+  }
 
   return (
     <Box sx={{
@@ -23,6 +44,7 @@ function Login() {
       position: 'relative',
       backgroundColor: 'background.default',
     }}>
+
 
       <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
         <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
@@ -62,8 +84,14 @@ function Login() {
             fullWidth
           />
 
-          <Button variant="contained" sx={{ width: '100%', mt: 1 }} onClick={() => login({ variables: { email, password_hash: password } }) }>
-            Login to your account
+          {error && (
+            <Typography color="error" variant="body2">
+              {error.message}
+            </Typography>
+          )}
+
+          <Button variant="contained" sx={{ width: '100%', mt: 1 }} onClick={handleLogin} disabled={loading}>
+            {loading ? 'Logging in...' : 'Login to your account'}
           </Button>
 
           <Typography variant="body2" textAlign="center" color="text.secondary">
