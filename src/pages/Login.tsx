@@ -20,7 +20,7 @@ function Login() {
       const result = await login({
         variables: {
           email,
-          password_hash: password,
+          password,
         }
       })
 

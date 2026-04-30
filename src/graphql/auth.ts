@@ -9,20 +9,12 @@ export type RegisterResponse = {
 export type RegisterVariables = {
   email: string;
   username: string;
-  password_hash: string;
+  password: string;
 };
 
 export const REGISTER = gql`
-  mutation Register(
-    $email: String!
-    $username: String!
-    $password_hash: String!
-  ) {
-    register(
-      email: $email
-      username: $username
-      password_hash: $password_hash
-    ) {
+  mutation Register($email: String!, $username: String!, $password: String!) {
+    register(email: $email, username: $username, password: $password) {
       token
     }
   }
@@ -36,12 +28,12 @@ export type LoginResponse = {
 
 export type LoginVariables = {
   email: string;
-  password_hash: string;
+  password: string;
 };
 
 export const LOGIN = gql`
-  mutation login($email: String!, $password_hash: String!) {
-    login(email: $email, password_hash: $password_hash) {
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
       token
     }
   }

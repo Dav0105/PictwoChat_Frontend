@@ -27,7 +27,7 @@ function Register() {
         variables: {
           email,
           username,
-          password_hash: password,
+          password,
         }
       })
 

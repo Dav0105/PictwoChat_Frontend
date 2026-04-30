@@ -11,7 +11,7 @@ function RequireAuth({ children }: RequireAuthProps) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
-      navigate('/login')
+      // navigate('/login') <- Activate when the token is implemented
     }
   }, [navigate])
 
