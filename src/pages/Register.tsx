@@ -12,9 +12,10 @@ import { useState } from 'react'
 
 
 function Register() {
+
   const navigate = useNavigate()
 
-  const [register, { data, loading, error }] = useMutation<RegisterResponse, RegisterVariables>(REGISTER);
+  const [register, { loading, error }] = useMutation<RegisterResponse, RegisterVariables>(REGISTER);
 
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
