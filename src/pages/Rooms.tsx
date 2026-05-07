@@ -32,9 +32,11 @@ function Room({roomName, num_users, room_size}: RoomProps) {
                 </Box>
 
                 <Box display={'flex'} justifyContent={'right'}>
-                    <Button variant="contained" color="secondary">
-                        Join
-                    </Button>
+                    <Link to="/chat">
+                        <Button variant="contained" color="secondary">
+                            Join
+                        </Button>
+                    </Link>
                 </Box>
             </Box>
 

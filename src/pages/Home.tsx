@@ -1,38 +1,16 @@
 import { Box, Button, Container } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { letterColors } from '../theme'
 import DrawBox from '../components/DrawBox'
+import Logo from '../components/Logo'
 
-const title = "PictwoChat"
+const title: string = "PictwoChat"
 
 function Home() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Container maxWidth="md">
         <Box sx={{ textAlign: 'center', py: 8 }}>
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
-            {title.split('').map((letter, index) => (
-              <Box
-                key={index}
-                component="span"
-                sx={{
-                  fontSize: { xs: '3rem', md: '5rem' },
-                  fontWeight: 'bold',
-                  color: letterColors[index % 3],
-                  display: 'inline-block',
-                  animation: 'wave 1.5s ease-in-out infinite',
-                  animationDelay: `${index * 0.1}s`,
-                  '@keyframes wave': {
-                    '0%, 100%': { transform: 'translateY(0)' },
-                    '50%': { transform: 'translateY(-15px)' },
-                  },
-                }}
-              >
-                {letter === ' ' ? '\u00A0' : letter}
-              </Box>
-            ))}
-          </Box>
+          <Logo animate={true}/>
           {/* <Box sx={{
             width: '600px',
             height: '400px',

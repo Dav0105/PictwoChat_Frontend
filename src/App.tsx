@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Rooms from './pages/Rooms'
+import Chat from './pages/Chat'
 import Profile from './pages/Profile'
 import RequireAuth from './components/RequireAuth'
 
@@ -19,6 +20,7 @@ function App() {
           </RequireAuth>
         } />
         <Route path="/login" element={<Login />} />
+        <Route path="/chat" element={<Chat />} />
         <Route path="/profile" element={
           <RequireAuth>
             <Profile />

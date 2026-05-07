@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material/styles'
 
+export const title = "PictwoChat"
+
 // Color palette : https://colorhunt.co/palette/b5c0d0ccd3caf5e8ddeed3d9
 export const colors = {
   primary: '#B5C0D0',
