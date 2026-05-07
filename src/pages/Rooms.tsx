@@ -1,5 +1,6 @@
 import { Person } from "@mui/icons-material"
 import { Button, Box, Container, Stack, Typography } from "@mui/material"
+import { Link } from "react-router-dom"
 
 type RoomProps = {
     roomName: string,
@@ -30,9 +31,11 @@ function Room({roomName, num_users, room_size}: RoomProps) {
                 </Box>
 
                 <Box display={'flex'} justifyContent={'right'}>
-                    <Button variant="contained" color="secondary">
-                        Join
-                    </Button>
+                    <Link to="/chat">
+                        <Button variant="contained" color="secondary">
+                            Join
+                        </Button>
+                    </Link>
                 </Box>
             </Box>
 
