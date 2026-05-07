@@ -1,6 +1,7 @@
-import { Person } from "@mui/icons-material"
+import { Person, } from "@mui/icons-material"
 import { Button, Box, Container, Stack, Typography } from "@mui/material"
 import { Link } from "react-router-dom"
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 type RoomProps = {
     roomName: string,
@@ -44,16 +45,19 @@ function Room({roomName, num_users, room_size}: RoomProps) {
 }
 
 function Rooms() {
-    
-
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
+            <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
+                <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
+                Back
+                </Button>
+            </Link>
             <Container maxWidth="md">
                 <Stack gap={"20px"}>
                     <Room roomName={"Room A"} num_users={2} room_size={8}/>
                     <Room roomName={"Room B"} num_users={5} room_size={8}/>
                 </Stack>
-                
+
             </Container>
         </Box>
     )
