@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 
 export type GetRoomsResponse = {
   rooms: string[];
-  nb_users: number;
+  //nb_users: number;
 };
 
 export type RoomVariables = {
   room: string;
-  nb_users: number;
+  //nb_users: number;
 };
 
 export type MessageVariables = {
@@ -54,7 +54,7 @@ export const getRooms = gql`
   query GetRooms {
     rooms {
       name
-      nb_users
+      
     }
   }
 `;
