@@ -1,9 +1,10 @@
 import { Person, } from "@mui/icons-material"
 import { Button, Box, Container, Stack, Typography, TextField } from "@mui/material"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useState } from "react"
 import { Modal } from "@mui/material"
+import { createRoomMutation } from "../graphql/rooms"
 
 type RoomProps = {
     roomName: string,
@@ -11,10 +12,32 @@ type RoomProps = {
     room_size: number
 }
 
-const roomsCreation = false
-
 // Create RoomPop up
-function CreateRoomPopup() {
+function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSuccess?: (roomId: string) => void }) {
+    const [roomName, setRoomName] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleCreate = async () => {
+        if (!roomName.trim()) {
+            alert("Please enter a room name");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const roomId = await createRoomMutation(roomName);
+            console.log("Room created with ID:", roomId);
+            setRoomName("");
+            onClose();
+            onSuccess?.(roomId);
+        } catch (error) {
+            console.error("Error creating room:", error);
+            alert("Failed to create room");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <Box sx={{
             position: 'absolute',
@@ -31,18 +54,40 @@ function CreateRoomPopup() {
             <Typography variant="h6" color="black" gutterBottom>
                 Create a new room
             </Typography>
-            <TextField fullWidth label="Room Name" variant="outlined" margin="normal" />
-            <Link to="/chat" style={{ textDecoration: 'none' }}>
-            <Button variant="contained" color="secondary" sx={{ mt: 2 }}>
-                Create
-            </Button>
-            </Link>
+            <TextField 
+                fullWidth 
+                label="Room Name" 
+                variant="outlined" 
+                margin="normal"
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+                disabled={isLoading}
+            />
+            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <Button 
+                    variant="contained" 
+                    color="secondary"
+                    onClick={handleCreate}
+                    disabled={isLoading}
+                    fullWidth
+                >
+                    {isLoading ? "Creating..." : "Create"}
+                </Button>
+                <Button 
+                    variant="outlined" 
+                    onClick={onClose}
+                    disabled={isLoading}
+                    fullWidth
+                >
+                    Cancel
+                </Button>
+            </Box>
         </Box>
     )
 }
 
 function Room({ roomName, num_users, room_size }: RoomProps) {
-
+                
     return (
         <Box color={"white"} sx={{
             width: '400px',
@@ -78,11 +123,28 @@ function Room({ roomName, num_users, room_size }: RoomProps) {
 
 function Rooms() {
     const [showPopup, setShowPopup] = useState(false)
+    const [rooms, setRooms] = useState([
+        //{ roomName: "Room A", num_users: 2, room_size: 8 },
+        //{ roomName: "Room B", num_users: 5, room_size: 8 }
+    ])
+    const navigate = useNavigate()
+
+    const handleClosePopup = () => {
+        setShowPopup(false)
+    }
+
+    const handleRoomCreated = (roomId: string) => {
+        console.log("Room created successfully, navigating to chat with room ID:", roomId)
+        navigate(`/chat/${roomId}`)
+    }
 
     return (
         <>
-            <Modal open={showPopup} onClose={() => setShowPopup(false)}>
-                <CreateRoomPopup />
+            <Modal open={showPopup} onClose={handleClosePopup}>
+                <CreateRoomPopup 
+                    onClose={handleClosePopup}
+                    onSuccess={handleRoomCreated}
+                />
             </Modal>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
                 <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
@@ -92,8 +154,14 @@ function Rooms() {
                 </Link>
                 <Container maxWidth="md">
                     <Stack gap={"20px"}>
-                        <Room roomName={"Room A"} num_users={2} room_size={8} />
-                        <Room roomName={"Room B"} num_users={5} room_size={8} />
+                        {rooms.map((room, idx) => (
+                            <Room 
+                                key={idx}
+                                roomName={room.roomName} 
+                                num_users={room.num_users} 
+                                room_size={room.room_size} 
+                            />
+                        ))}
                     </Stack>
                 </Container>
                 <Button
