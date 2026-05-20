@@ -2,14 +2,21 @@ import { Person, } from "@mui/icons-material"
 import { Button, Box, Container, Stack, Typography, TextField } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Modal } from "@mui/material"
+import { getRooms } from "../graphql/chat"
+import client from "../lib/apolloClient"
 import { createRoomMutation } from "../graphql/rooms"
 
 type RoomProps = {
     roomName: string,
     num_users: number
     room_size: number
+}
+
+type RoomListItem = {
+    name: string
+    //nb_users: number
 }
 
 // Create RoomPop up
@@ -123,11 +130,47 @@ function Room({ roomName, num_users, room_size }: RoomProps) {
 
 function Rooms() {
     const [showPopup, setShowPopup] = useState(false)
-    const [rooms, setRooms] = useState([
-        //{ roomName: "Room A", num_users: 2, room_size: 8 },
-        //{ roomName: "Room B", num_users: 5, room_size: 8 }
-    ])
+    const [rooms, setRooms] = useState<RoomListItem[]>([])
+    const [isLoadingRooms, setIsLoadingRooms] = useState(true)
+    const [roomsError, setRoomsError] = useState<string | null>(null)
     const navigate = useNavigate()
+
+    useEffect(() => {
+        let isMounted = true
+
+        const loadRooms = async () => {
+            try {
+                const result = await client.query<{ rooms: RoomListItem[] }>({
+                    query: getRooms,
+                    fetchPolicy: "network-only",
+                })
+
+                if (!isMounted) {
+                    return
+                }
+
+                setRooms(result.data?.rooms ?? [])
+                setRoomsError(null)
+            } catch (error) {
+                if (!isMounted) {
+                    return
+                }
+
+                console.error("Error loading rooms:", error)
+                setRoomsError("Failed to load rooms.")
+            } finally {
+                if (isMounted) {
+                    setIsLoadingRooms(false)
+                }
+            }
+        }
+
+        void loadRooms()
+
+        return () => {
+            isMounted = false
+        }
+    }, [])
 
     const handleClosePopup = () => {
         setShowPopup(false)
@@ -154,12 +197,15 @@ function Rooms() {
                 </Link>
                 <Container maxWidth="md">
                     <Stack gap={"20px"}>
-                        {rooms.map((room, idx) => (
-                            <Room 
-                                key={idx}
-                                roomName={room.roomName} 
-                                num_users={room.num_users} 
-                                room_size={room.room_size} 
+                        {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
+                        {roomsError && <Typography color="error">{roomsError}</Typography>}
+                        {rooms.map((room) => (
+                            <Room
+                                key={room.name}
+                                roomName={room.name}
+                                //num_users={room.nb_users}
+                                num_users={1}
+                                room_size={8}
                             />
                         ))}
                     </Stack>
