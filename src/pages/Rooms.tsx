@@ -7,6 +7,7 @@ import { Modal } from "@mui/material"
 import { getRooms } from "../graphql/chat"
 import client from "../lib/apolloClient"
 import { createRoomMutation } from "../graphql/rooms"
+import LogoutButton from '../components/LogoutButton'
 
 type RoomProps = {
     roomName: string,
@@ -195,6 +196,9 @@ function Rooms() {
                         Back
                     </Button>
                 </Link>
+                <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                    <LogoutButton />
+                </Box>
                 <Container maxWidth="md">
                     <Stack gap={"20px"}>
                         {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
