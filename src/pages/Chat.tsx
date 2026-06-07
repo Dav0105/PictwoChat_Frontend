@@ -1,21 +1,39 @@
-import { Box, Button, Container, Grid, TextField } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Button, Container, Grid, TextField, Typography } from "@mui/material";
+import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
-import { useState, type MouseEventHandler } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { ReactSketchCanvasRef } from "react-sketch-canvas";
+import { useQuery, useMutation } from "@apollo/client/react";
+import {
+  GET_ROOM_MESSAGES,
+  SEND_MESSAGE,
+  type RoomMessagesResponse,
+  type RoomMessagesVars,
+  type SendMessageResponse,
+  type SendMessageVars,
+  type MessageItem,
+} from "../graphql/chat";
+
+// userId extrait du token JWT (payload = 2e segment, encodé en base64)
+function getUserId(): string | null {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split(".")[1])).userId;
+  } catch {
+    return null;
+  }
+}
 
 function Msg({ username, children }: { username?: string; children?: React.ReactNode }) {
   return (
     <Box sx={{
-      width: '400px',
-      backgroundColor: 'white',
-      border: '2px solid #1a1a1a',
+      width: '400px', backgroundColor: 'white', border: '2px solid #1a1a1a',
       borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
-      boxShadow: '3px 3px 0px #1a1a1a',
-      mx: 'auto',
-      mb: 1,
+      boxShadow: '3px 3px 0px #1a1a1a', mx: 'auto', mb: 1,
     }}>
       <div style={{ display: "flex", alignItems: "center" }}>
         <Person color="info" />
@@ -23,113 +41,112 @@ function Msg({ username, children }: { username?: string; children?: React.React
       </div>
       <p style={{ color: "black" }}>{children}</p>
     </Box>
-  )
-}
-
-function MsgBox({ messages }: { messages: string[] }) {
-  return (
-    <Box sx={{ overflowY: 'auto', maxHeight: '50vh' }}>
-      <Msg username="Salut">Salut</Msg>
-      {messages.map((msg, i) => (
-        <Msg key={i}>{msg}</Msg>
-      ))}
-    </Box>
-  )
-}
-
-function ChatBox({
-  inputValue,
-  setInputValue,
-  sendMsg,
-}: {
-  inputValue: string;
-  setInputValue: (v: string) => void;
-  sendMsg: MouseEventHandler;
-}) {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", maxHeight: '50vh' }}>
-      <Container maxWidth="md">
-        <Box sx={{ textAlign: "center", py: 1 }}>
-          <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            width: { xs: "100%", sm: "80%" },
-            mx: "auto",
-            mt: "30px",
-          }}>
-            <DrawBox width={"100%"} height={"200px"} />
-            <TextField
-              id="filled-multiline-flexible"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              label="Enter your message here"
-              multiline
-              maxRows={4}
-              variant="filled"
-            />
-            <Button variant="contained" sx={{ width: "100%" }} onClick={sendMsg}>
-              Send
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-    </Box>
-  )
+  );
 }
 
 function Chat() {
-  const [messages, setMessages] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("")
+  const { roomId } = useParams<{ roomId: string }>();
+  const userId = getUserId();
+  const [inputValue, setInputValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Charge les messages de la room
+  const { data, refetch } = useQuery<RoomMessagesResponse, RoomMessagesVars>(
+    GET_ROOM_MESSAGES,
+    { variables: { room_id: roomId! }, skip: !roomId, pollInterval: 3000, }
+  );
+
+  const [sendMessage] = useMutation<SendMessageResponse, SendMessageVars>(SEND_MESSAGE);
+
+  const messages: MessageItem[] = data?.roomMessages ?? [];
 
   async function checkProfanity(text: string): Promise<boolean> {
     const res = await fetch("https://vector.profanity.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    })
-    const data = await res.json()
-    return data.isProfanity
+      body: JSON.stringify({ message: text }),
+    });
+    return (await res.json()).isProfanity;
   }
 
+  const canvasRef = useRef<ReactSketchCanvasRef>(null);
 
+  const handleSend = async () => {
+    setError(null);
+    const text = inputValue.trim();
 
-  const sendMsg: MouseEventHandler = (_event) => {
+    const paths = await canvasRef.current?.exportPaths();
+    const hasDrawing = !!paths && paths.length > 0;
+    const image = hasDrawing ? await canvasRef.current?.exportImage("png") : undefined;
 
-    const msg = inputValue
-    if (msg != "") {
-      const handle = async () => {
-        console.log("ouais")
+    if (!text && !image) return;
+    if (!roomId || !userId) return;
+
     try {
-      const isProfane = await checkProfanity(msg)
-
-      if (!isProfane) {
-        setMessages(prev => [...prev, msg])
-        setInputValue("")
+      if (text && (await checkProfanity(text))) {
+        setError("Message blocked: inappropriate language.");
+        return;
       }
-    } catch (error) {
-      console.error("Profanity check failed:", error)
-      // Handle error - maybe still allow the message or show an error
+      await sendMessage({ variables: { user_id: userId, room_id: roomId, text: text || undefined, image } });
+      setInputValue("");
+      canvasRef.current?.clearCanvas();
+      await refetch();
+    } catch (e) {
+      console.error("Send failed:", e);
+      setError("Failed to send, please try again.");
     }
-  }
+  };
 
-      handle()
+  const prevCount = useRef(0);
+
+  useEffect(() => {
+    if (messages.length > prevCount.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }
+    prevCount.current = messages.length;
+  }, [messages]);
 
   return (
-    <Grid container spacing={2} direction={"column"} display={'flex'} justifyContent={'space-between'} height={'100vh'}>
+    <Grid container spacing={2} direction="column" display="flex" justifyContent="space-between" height="100vh">
       <Link to="/rooms" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
-        <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
-          Back
-        </Button>
+        <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>Back</Button>
       </Link>
+
       <Grid>
         <Logo size_xs='1.5rem' size_md='2.5rem' />
-        <MsgBox messages={messages} />
+        <Box sx={{ overflowY: 'auto', maxHeight: '50vh' }}>
+          {messages.map((msg) => (
+            <Msg key={msg._id} username={msg.user?.username}>
+              {msg.text}
+              {msg.image && (
+                <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />
+              )}
+            </Msg>
+          ))}
+          <div ref={bottomRef} />
+        </Box>
       </Grid>
+
       <Grid>
-        <ChatBox inputValue={inputValue} setInputValue={setInputValue} sendMsg={sendMsg} />
+        <Container maxWidth="md">
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px" }}>
+            <DrawBox width={"100%"} height={"200px"} canvasRef={canvasRef} />
+            <TextField
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              label="Enter your message here"
+              multiline maxRows={4} variant="filled"
+            />
+            {error && (
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+            )}
+            <Button variant="contained" sx={{ width: "100%" }} onClick={handleSend}>Send</Button>
+          </Box>
+        </Container>
       </Grid>
     </Grid>
   );

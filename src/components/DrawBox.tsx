@@ -1,4 +1,4 @@
-import { ReactSketchCanvas, type ReactSketchCanvasRef} from "react-sketch-canvas";
+import { ReactSketchCanvas, type ReactSketchCanvasRef } from "react-sketch-canvas";
 import { Box, Button, Icon } from '@mui/material'
 import { useRef, useState, type CSSProperties } from "react";
 import ModeIcon from '@mui/icons-material/Mode';
@@ -10,13 +10,15 @@ type DrawBoxProps = {
     height: string
     color?: string
     displaySaveBtn?: boolean
+    canvasRef?: React.RefObject<ReactSketchCanvasRef | null>,
 }
 
-function DrawBox({width = "500px", height = "450px", color = '#000000', displaySaveBtn = false}: DrawBoxProps) {
-    const canvasRef = useRef<ReactSketchCanvasRef>(null);
+function DrawBox({ width = "500px", height = "450px", color = '#000000', displaySaveBtn = false, canvasRef: externalRef }: DrawBoxProps) {
+    const internalRef = useRef<ReactSketchCanvasRef>(null);
+    const canvasRef = externalRef ?? internalRef;
     const [eraseMode, setEraseMode] = useState(false);
 
-    const pressedStyle: CSSProperties = {boxShadow: '1px 1px 0px black', transform: 'translate(2px, 2px)'}
+    const pressedStyle: CSSProperties = { boxShadow: '1px 1px 0px black', transform: 'translate(2px, 2px)' }
 
     const pencilPressed = () => {
         setEraseMode(false)
@@ -97,11 +99,11 @@ function DrawBox({width = "500px", height = "450px", color = '#000000', displayS
                     {eraseBtn}
                 </Box>
                 <Box sx={{ display: 'inline-flex', justifyContent: 'right', gap: '2px' }}>
-                    { displaySaveBtn ? (
+                    {displaySaveBtn ? (
                         <Button onClick={savedPressed}>
                             Save
                         </Button>
-                        ) : null
+                    ) : null
                     }
 
                     <Button onClick={cleanPressed}>
@@ -111,7 +113,7 @@ function DrawBox({width = "500px", height = "450px", color = '#000000', displayS
             </Box>
             {/* Canvas */}
             <Box sx={{
-                width: width, 
+                width: width,
                 height: height,
                 backgroundColor: 'white',
                 border: '2px solid #1a1a1a',
@@ -124,7 +126,7 @@ function DrawBox({width = "500px", height = "450px", color = '#000000', displayS
                     // width="750px"
                     // height="450px"
                     canvasColor="#00000000"
-                    strokeColor={color}   
+                    strokeColor={color}
                 />
             </Box>
         </Box>
