@@ -4,7 +4,7 @@ import DrawBox from "../components/DrawBox";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactSketchCanvasRef } from "react-sketch-canvas";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
@@ -49,6 +49,8 @@ function Chat() {
   const userId = getUserId();
   const [inputValue, setInputValue] = useState("");
 
+  const bottomRef = useRef<HTMLDivElement>(null);
+
   // Charge les messages de la room
   const { data, refetch } = useQuery<RoomMessagesResponse, RoomMessagesVars>(
     GET_ROOM_MESSAGES,
@@ -92,6 +94,10 @@ function Chat() {
     }
   };
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <Grid container spacing={2} direction="column" display="flex" justifyContent="space-between" height="100vh">
       <Link to="/rooms" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
@@ -109,6 +115,7 @@ function Chat() {
               )}
             </Msg>
           ))}
+          <div ref={bottomRef} />
         </Box>
       </Grid>
 

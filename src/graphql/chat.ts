@@ -45,7 +45,6 @@ export const SEND_MESSAGE = gql`
   }
 `;
 
-// On garde getRooms, mais on ajoute _id pour pouvoir ouvrir le bon chat
 export const getRooms = gql`
   query GetRooms {
     rooms {
