@@ -20,7 +20,7 @@ function App() {
           </RequireAuth>
         } />
         <Route path="/login" element={<Login />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:roomId" element={<Chat />} />
         <Route path="/profile" element={
           <RequireAuth>
             <Profile />

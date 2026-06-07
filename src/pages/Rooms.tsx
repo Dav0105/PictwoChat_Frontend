@@ -16,8 +16,8 @@ type RoomProps = {
 }
 
 type RoomListItem = {
+    _id: string
     name: string
-    //nb_users: number
 }
 
 // Create RoomPop up
@@ -62,18 +62,18 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
             <Typography variant="h6" color="black" gutterBottom>
                 Create a new room
             </Typography>
-            <TextField 
-                fullWidth 
-                label="Room Name" 
-                variant="outlined" 
+            <TextField
+                fullWidth
+                label="Room Name"
+                variant="outlined"
                 margin="normal"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 disabled={isLoading}
             />
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                <Button 
-                    variant="contained" 
+                <Button
+                    variant="contained"
                     color="secondary"
                     onClick={handleCreate}
                     disabled={isLoading}
@@ -81,8 +81,8 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
                 >
                     {isLoading ? "Creating..." : "Create"}
                 </Button>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={onClose}
                     disabled={isLoading}
                     fullWidth
@@ -94,8 +94,8 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
     )
 }
 
-function Room({ roomName, num_users, room_size }: RoomProps) {
-                
+function Room({ roomId, roomName, num_users, room_size }: RoomProps & { roomId: string }) {
+
     return (
         <Box color={"white"} sx={{
             width: '400px',
@@ -117,10 +117,8 @@ function Room({ roomName, num_users, room_size }: RoomProps) {
                 </Box>
 
                 <Box display={'flex'} justifyContent={'right'}>
-                    <Link to="/chat">
-                        <Button variant="contained" color="secondary">
-                            Join
-                        </Button>
+                    <Link to={`/chat/${roomId}`}>
+                        <Button variant="contained" color="secondary">Join</Button>
                     </Link>
                 </Box>
             </Box>
@@ -185,7 +183,7 @@ function Rooms() {
     return (
         <>
             <Modal open={showPopup} onClose={handleClosePopup}>
-                <CreateRoomPopup 
+                <CreateRoomPopup
                     onClose={handleClosePopup}
                     onSuccess={handleRoomCreated}
                 />
@@ -204,13 +202,7 @@ function Rooms() {
                         {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
                         {roomsError && <Typography color="error">{roomsError}</Typography>}
                         {rooms.map((room) => (
-                            <Room
-                                key={room.name}
-                                roomName={room.name}
-                                //num_users={room.nb_users}
-                                num_users={1}
-                                room_size={8}
-                            />
+                            <Room key={room._id} roomId={room._id} roomName={room.name} num_users={1} room_size={8} />
                         ))}
                     </Stack>
                 </Container>
