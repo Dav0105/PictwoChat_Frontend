@@ -69,6 +69,7 @@ function Chat() {
 
   const handleSend = async () => {
     const text = inputValue.trim();
+    console.log({ text, roomId, userId }); 
     if (!text || !roomId || !userId) return;
     try {
       if (await checkProfanity(text)) return; // bloqué si grossier
