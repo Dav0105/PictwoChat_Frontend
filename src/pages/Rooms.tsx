@@ -9,6 +9,7 @@ import client from "../lib/apolloClient"
 import { createRoomMutation, removeRoomMutation } from "../graphql/rooms"
 import LogoutButton from '../components/LogoutButton'
 import DeleteIcon from '@mui/icons-material/Delete'
+import SettingsIcon from '@mui/icons-material/Settings'
 
 type RoomProps = {
     roomName: string,
@@ -193,9 +194,9 @@ function Rooms() {
                 />
             </Modal>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-                <Link to="/" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
-                    <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
-                        Back
+                <Link to="/profile" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
+                    <Button variant="contained" color="secondary" startIcon={<SettingsIcon />}>
+                        Settings
                     </Button>
                 </Link>
                 <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
