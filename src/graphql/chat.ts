@@ -4,7 +4,7 @@ export type MessageItem = {
   _id: string;
   text?: string;
   image?: string;
-  user: { _id: string; username: string };
+  user: { _id: string; username: string; pfp?: string };
 };
 
 export type RoomMessagesResponse = { roomMessages: MessageItem[] };
@@ -27,6 +27,7 @@ export const GET_ROOM_MESSAGES = gql`
       user {
         _id
         username
+        pfp
       }
     }
   }

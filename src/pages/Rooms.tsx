@@ -6,9 +6,11 @@ import { useEffect, useState } from "react"
 import { Modal } from "@mui/material"
 import { getRooms } from "../graphql/chat"
 import client from "../lib/apolloClient"
-import { createRoomMutation } from "../graphql/rooms"
+import { createRoomMutation, removeRoomMutation } from "../graphql/rooms"
 import LogoutButton from '../components/LogoutButton'
 import Logo from "../components/Logo"
+import DeleteIcon from '@mui/icons-material/Delete'
+import SettingsIcon from '@mui/icons-material/Settings'
 
 type RoomProps = {
   roomName: string,
@@ -95,7 +97,7 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
   )
 }
 
-function Room({ roomId, roomName, num_users, room_size }: RoomProps & { roomId: string }) {
+function Room({ roomId, roomName, num_users, room_size, onDelete }: RoomProps & { roomId: string; onDelete: (id: string) => void }) {
 
   return (
     <Box color={"white"} sx={{
@@ -121,6 +123,9 @@ function Room({ roomId, roomName, num_users, room_size }: RoomProps & { roomId: 
           <Link to={`/chat/${roomId}`}>
             <Button variant="contained" color="secondary">Join</Button>
           </Link>
+                    <Button variant="contained" color="error" onClick={() => onDelete(roomId)}>
+                        <DeleteIcon />
+                    </Button>
         </Box>
       </Box>
 
@@ -191,9 +196,9 @@ function Rooms() {
         />
       </Modal>
       <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-        <Link to="/" style={{ textDecoration: 'none', position: 'fixed', top: 16, left: 16 }}>
-          <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>
-            Back
+        <Link to="/profile" style={{ textDecoration: 'none', position: 'fixed', top: 16, left: 16 }}>
+          <Button variant="contained" color="secondary" startIcon={<SettingsIcon />}>
+            Settings
           </Button>
         </Link>
         <Box sx={{ position: 'fixed', top: 16, right: 16 }}>

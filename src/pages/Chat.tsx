@@ -1,6 +1,8 @@
-import { Box, Button, Container, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, TextField, Typography, IconButton, InputAdornment, Popover, Avatar } from "@mui/material";
+import GifIcon from "@mui/icons-material/Gif";
 import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
+import GifPicker from "../components/GifPicker";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
@@ -28,15 +30,17 @@ function getUserId(): string | null {
   }
 }
 
-function Msg({ username, children }: { username?: string; children?: React.ReactNode }) {
+function Msg({ username, pfp, children }: { username?: string; pfp?: string; children?: React.ReactNode }) {
   return (
     <Box sx={{
       width: '400px', backgroundColor: 'white', border: '2px solid #1a1a1a',
       borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
       boxShadow: '3px 3px 0px #1a1a1a', mx: 'auto', mb: 1,
     }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Person color="info" />
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Avatar src={pfp} sx={{ width: 28, height: 28 }}>
+          {username?.[0]?.toUpperCase()}
+        </Avatar>
         <p style={{ color: "black" }}>{username}</p>
       </div>
       <p style={{ color: "black" }}>{children}</p>
@@ -49,6 +53,8 @@ function Chat() {
   const userId = getUserId();
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [gifAnchor, setGifAnchor] = useState<HTMLElement | null>(null);
+  const gifOpen = Boolean(gifAnchor);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +105,16 @@ function Chat() {
     }
   };
 
+  const handleSendGif = async (url: string) => {
+    if (!roomId || !userId) return;
+    try {
+      await sendMessage({ variables: { user_id: userId, room_id: roomId, image: url } });
+      setGifAnchor(null);
+      await refetch();
+    } catch (e) {
+      console.error("GIF send failed:", e);
+    }
+  };
   const prevCount = useRef(0);
 
   useEffect(() => {
@@ -109,20 +125,18 @@ function Chat() {
   }, [messages]);
 
   return (
-    <Grid container spacing={2} direction="column" display="flex" justifyContent="space-between" height="100vh">
+    <Grid container spacing={2} direction="column" height="100vh" sx={{ flexWrap: "nowrap" }}>
       <Link to="/rooms" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
         <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>Back</Button>
       </Link>
 
-      <Grid>
+      <Grid sx={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column" }}>
         <Logo size_xs='1.5rem' size_md='2.5rem' />
-        <Box sx={{ overflowY: 'auto', maxHeight: '50vh' }}>
+        <Box sx={{ mt: "auto" }}>
           {messages.map((msg) => (
-            <Msg key={msg._id} username={msg.user?.username}>
+            <Msg key={msg._id} username={msg.user?.username} pfp={msg.user?.pfp}>
               {msg.text}
-              {msg.image && (
-                <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />
-              )}
+              {msg.image && <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />}
             </Msg>
           ))}
           <div ref={bottomRef} />
@@ -133,12 +147,35 @@ function Chat() {
         <Container maxWidth="md">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px" }}>
             <DrawBox width={"100%"} height={"200px"} canvasRef={canvasRef} />
+
             <TextField
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               label="Enter your message here"
               multiline maxRows={4} variant="filled"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={(e) => setGifAnchor(e.currentTarget)} edge="end">
+                        <GifIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
+            <Popover
+              open={gifOpen}
+              anchorEl={gifAnchor}
+              onClose={() => setGifAnchor(null)}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+              <Box sx={{ p: 2, width: 360 }}>
+                <GifPicker onSelect={handleSendGif} />
+              </Box>
+            </Popover>
             {error && (
               <Typography color="error" variant="body2">
                 {error}
