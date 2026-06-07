@@ -6,8 +6,9 @@ import { useEffect, useState } from "react"
 import { Modal } from "@mui/material"
 import { getRooms } from "../graphql/chat"
 import client from "../lib/apolloClient"
-import { createRoomMutation } from "../graphql/rooms"
+import { createRoomMutation, removeRoomMutation } from "../graphql/rooms"
 import LogoutButton from '../components/LogoutButton'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 type RoomProps = {
     roomName: string,
@@ -94,7 +95,7 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
     )
 }
 
-function Room({ roomId, roomName, num_users, room_size }: RoomProps & { roomId: string }) {
+function Room({ roomId, roomName, num_users, room_size, onDelete }: RoomProps & { roomId: string; onDelete: (id: string) => void }) {
 
     return (
         <Box color={"white"} sx={{
@@ -120,6 +121,9 @@ function Room({ roomId, roomName, num_users, room_size }: RoomProps & { roomId: 
                     <Link to={`/chat/${roomId}`}>
                         <Button variant="contained" color="secondary">Join</Button>
                     </Link>
+                    <Button variant="contained" color="error" onClick={() => onDelete(roomId)}>
+                        <DeleteIcon />
+                    </Button>
                 </Box>
             </Box>
 

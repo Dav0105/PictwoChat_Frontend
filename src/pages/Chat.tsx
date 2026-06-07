@@ -1,6 +1,8 @@
-import { Box, Button, Container, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, TextField, Typography, IconButton, InputAdornment, Popover } from "@mui/material";
+import GifIcon from "@mui/icons-material/Gif";
 import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
+import GifPicker from "../components/GifPicker";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
@@ -49,6 +51,8 @@ function Chat() {
   const userId = getUserId();
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [gifAnchor, setGifAnchor] = useState<HTMLElement | null>(null);
+  const gifOpen = Boolean(gifAnchor);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +103,16 @@ function Chat() {
     }
   };
 
+  const handleSendGif = async (url: string) => {
+    if (!roomId || !userId) return;
+    try {
+      await sendMessage({ variables: { user_id: userId, room_id: roomId, image: url } });
+      setGifAnchor(null);
+      await refetch();
+    } catch (e) {
+      console.error("GIF send failed:", e);
+    }
+  };
   const prevCount = useRef(0);
 
   useEffect(() => {
@@ -133,12 +147,35 @@ function Chat() {
         <Container maxWidth="md">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px" }}>
             <DrawBox width={"100%"} height={"200px"} canvasRef={canvasRef} />
+
             <TextField
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               label="Enter your message here"
               multiline maxRows={4} variant="filled"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={(e) => setGifAnchor(e.currentTarget)} edge="end">
+                        <GifIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
+            <Popover
+              open={gifOpen}
+              anchorEl={gifAnchor}
+              onClose={() => setGifAnchor(null)}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+              <Box sx={{ p: 2, width: 360 }}>
+                <GifPicker onSelect={handleSendGif} />
+              </Box>
+            </Popover>
             {error && (
               <Typography color="error" variant="body2">
                 {error}
