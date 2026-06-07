@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, TextField, Typography, IconButton, InputAdornment, Popover } from "@mui/material";
+import { Box, Button, Container, Grid, TextField, Typography, IconButton, InputAdornment, Popover, Avatar } from "@mui/material";
 import GifIcon from "@mui/icons-material/Gif";
 import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
@@ -30,15 +30,17 @@ function getUserId(): string | null {
   }
 }
 
-function Msg({ username, children }: { username?: string; children?: React.ReactNode }) {
+function Msg({ username, pfp, children }: { username?: string; pfp?: string; children?: React.ReactNode }) {
   return (
     <Box sx={{
       width: '400px', backgroundColor: 'white', border: '2px solid #1a1a1a',
       borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
       boxShadow: '3px 3px 0px #1a1a1a', mx: 'auto', mb: 1,
     }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Person color="info" />
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Avatar src={pfp} sx={{ width: 28, height: 28 }}>
+          {username?.[0]?.toUpperCase()}
+        </Avatar>
         <p style={{ color: "black" }}>{username}</p>
       </div>
       <p style={{ color: "black" }}>{children}</p>
@@ -132,11 +134,9 @@ function Chat() {
         <Logo size_xs='1.5rem' size_md='2.5rem' />
         <Box sx={{ mt: "auto" }}>
           {messages.map((msg) => (
-            <Msg key={msg._id} username={msg.user?.username}>
+            <Msg key={msg._id} username={msg.user?.username} pfp={msg.user?.pfp}>
               {msg.text}
-              {msg.image && (
-                <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />
-              )}
+              {msg.image && <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />}
             </Msg>
           ))}
           <div ref={bottomRef} />
