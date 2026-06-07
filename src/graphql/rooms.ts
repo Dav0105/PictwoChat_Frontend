@@ -11,6 +11,12 @@ export type CreateRoomVariables = {
     name: string;
 };
 
+export const REMOVE_ROOM = gql`
+  mutation RemoveRoom($_id: String!) {
+    removeRoom(_id: $_id)
+  }
+`;
+
 
 
 export const CREATE_ROOM = gql`
@@ -29,4 +35,11 @@ export async function createRoomMutation(name: string): Promise<string> {
         variables: { name }
     });
     return result.data?.createRoom._id || "";
+}
+
+export async function removeRoomMutation(id: string): Promise<void> {
+  await client.mutate<{ removeRoom: string }, { _id: string }>({
+    mutation: REMOVE_ROOM,
+    variables: { _id: id },
+  });
 }
