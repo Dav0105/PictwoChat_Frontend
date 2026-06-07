@@ -4,7 +4,8 @@ import DrawBox from "../components/DrawBox";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { ReactSketchCanvasRef } from "react-sketch-canvas";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   GET_ROOM_MESSAGES,
@@ -67,14 +68,24 @@ function Chat() {
     return (await res.json()).isProfanity;
   }
 
+  const canvasRef = useRef<ReactSketchCanvasRef>(null);
+
   const handleSend = async () => {
     const text = inputValue.trim();
-    console.log({ text, roomId, userId }); 
-    if (!text || !roomId || !userId) return;
+    const paths = await canvasRef.current?.exportPaths();
+    const hasDrawing = !!paths && paths.length > 0;
+    const image = hasDrawing ? await canvasRef.current?.exportImage("png") : undefined;
+
+    if (!text && !image) return;
+    if (!roomId || !userId) return;
+
     try {
-      if (await checkProfanity(text)) return; // bloqué si grossier
-      await sendMessage({ variables: { user_id: userId, room_id: roomId, text } });
+      if (text && (await checkProfanity(text))) return;
+      await sendMessage({
+        variables: { user_id: userId, room_id: roomId, text: text || undefined, image },
+      });
       setInputValue("");
+      canvasRef.current?.clearCanvas();
       await refetch();
     } catch (e) {
       console.error("Send failed:", e);
@@ -91,7 +102,12 @@ function Chat() {
         <Logo size_xs='1.5rem' size_md='2.5rem' />
         <Box sx={{ overflowY: 'auto', maxHeight: '50vh' }}>
           {messages.map((msg) => (
-            <Msg key={msg._id} username={msg.user?.username}>{msg.text}</Msg>
+            <Msg key={msg._id} username={msg.user?.username}>
+              {msg.text}
+              {msg.image && (
+                <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />
+              )}
+            </Msg>
           ))}
         </Box>
       </Grid>
@@ -99,7 +115,7 @@ function Chat() {
       <Grid>
         <Container maxWidth="md">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px" }}>
-            <DrawBox width={"100%"} height={"200px"} />
+            <DrawBox width={"100%"} height={"200px"} canvasRef={canvasRef} />
             <TextField
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
