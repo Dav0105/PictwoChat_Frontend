@@ -123,14 +123,14 @@ function Chat() {
   }, [messages]);
 
   return (
-    <Grid container spacing={2} direction="column" display="flex" justifyContent="space-between" height="100vh">
+    <Grid container spacing={2} direction="column" height="100vh" sx={{ flexWrap: "nowrap" }}>
       <Link to="/rooms" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
         <Button variant="contained" color="secondary" startIcon={<ArrowBackIcon />}>Back</Button>
       </Link>
 
-      <Grid>
+      <Grid sx={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column" }}>
         <Logo size_xs='1.5rem' size_md='2.5rem' />
-        <Box sx={{ overflowY: 'auto', maxHeight: '50vh' }}>
+        <Box sx={{ mt: "auto" }}>
           {messages.map((msg) => (
             <Msg key={msg._id} username={msg.user?.username}>
               {msg.text}
