@@ -55,7 +55,7 @@ function Chat() {
   // Charge les messages de la room
   const { data, refetch } = useQuery<RoomMessagesResponse, RoomMessagesVars>(
     GET_ROOM_MESSAGES,
-    { variables: { room_id: roomId! }, skip: !roomId }
+    { variables: { room_id: roomId! }, skip: !roomId, pollInterval: 3000, }
   );
 
   const [sendMessage] = useMutation<SendMessageResponse, SendMessageVars>(SEND_MESSAGE);
@@ -99,8 +99,13 @@ function Chat() {
     }
   };
 
+  const prevCount = useRef(0);
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > prevCount.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    prevCount.current = messages.length;
   }, [messages]);
 
   return (
