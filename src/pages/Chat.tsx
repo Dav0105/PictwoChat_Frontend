@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, TextField } from "@mui/material";
+import { Box, Button, Container, Grid, TextField, Typography } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -48,6 +48,7 @@ function Chat() {
   const { roomId } = useParams<{ roomId: string }>();
   const userId = getUserId();
   const [inputValue, setInputValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -73,7 +74,9 @@ function Chat() {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
 
   const handleSend = async () => {
+    setError(null);
     const text = inputValue.trim();
+
     const paths = await canvasRef.current?.exportPaths();
     const hasDrawing = !!paths && paths.length > 0;
     const image = hasDrawing ? await canvasRef.current?.exportImage("png") : undefined;
@@ -82,15 +85,17 @@ function Chat() {
     if (!roomId || !userId) return;
 
     try {
-      if (text && (await checkProfanity(text))) return;
-      await sendMessage({
-        variables: { user_id: userId, room_id: roomId, text: text || undefined, image },
-      });
+      if (text && (await checkProfanity(text))) {
+        setError("Message blocked: inappropriate language.");
+        return;
+      }
+      await sendMessage({ variables: { user_id: userId, room_id: roomId, text: text || undefined, image } });
       setInputValue("");
       canvasRef.current?.clearCanvas();
       await refetch();
     } catch (e) {
       console.error("Send failed:", e);
+      setError("Failed to send, please try again.");
     }
   };
 
@@ -129,6 +134,11 @@ function Chat() {
               label="Enter your message here"
               multiline maxRows={4} variant="filled"
             />
+            {error && (
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+            )}
             <Button variant="contained" sx={{ width: "100%" }} onClick={handleSend}>Send</Button>
           </Box>
         </Container>
