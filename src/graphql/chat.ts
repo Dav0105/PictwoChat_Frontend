@@ -51,6 +51,7 @@ export const getRooms = gql`
     rooms {
       _id
       name
+      createdBy
     }
   }
 `;

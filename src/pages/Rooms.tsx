@@ -19,8 +19,9 @@ type RoomProps = {
 }
 
 type RoomListItem = {
-  _id: string
-  name: string
+    _id: string
+    name: string
+    createdBy?: string
 }
 
 // Create RoomPop up
@@ -97,35 +98,28 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
   )
 }
 
-function Room({ roomId, roomName, num_users, room_size, onDelete }: RoomProps & { roomId: string; onDelete: (id: string) => void }) {
-
-  return (
-    <Box color={"white"} sx={{
-      width: '400px',
-      // height: '100px',
-      backgroundColor: 'white',
-      border: '2px solid #1a1a1a',
-      padding: '10px',
-      borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
-      boxShadow: '3px 3px 0px #1a1a1a',
-      mx: 'auto',
-    }} >
-
-      <Typography variant="body1" color="black">{roomName}</Typography>
-
-      <Box display={'flex'}>
-        <Box sx={{ display: 'flex', marginTop: 'auto', marginBottom: 'auto', marginRight: 'auto' }}>
-          <Person color="disabled" />
-          <Typography variant="subtitle1" color="black">{num_users}/{room_size}</Typography>
-        </Box>
-
-        <Box display={'flex'} justifyContent={'right'}>
-          <Link to={`/chat/${roomId}`}>
-            <Button variant="contained" color="secondary">Join</Button>
-          </Link>
+function Room({ roomId, roomName, canDelete, onDelete }: { roomId: string; roomName: string; canDelete: boolean; onDelete: (id: string) => void }) {
+    return (
+        <Box color={"white"} sx={{
+            width: '400px',
+            backgroundColor: 'white',
+            border: '2px solid #1a1a1a',
+            padding: '10px',
+            borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
+            boxShadow: '3px 3px 0px #1a1a1a',
+            mx: 'auto',
+        }} >
+            <Typography variant="body1" color="black">{roomName}</Typography>
+            <Box display={'flex'} justifyContent={'flex-end'} gap={1}>
+                <Link to={`/chat/${roomId}`}>
+                    <Button variant="contained" color="secondary">Join</Button>
+                </Link>
+                {canDelete && (
                     <Button variant="contained" color="error" onClick={() => onDelete(roomId)}>
                         <DeleteIcon />
                     </Button>
+                )}
+            </Box>
         </Box>
       </Box>
 
@@ -172,58 +166,73 @@ function Rooms() {
 
     void loadRooms()
 
-    return () => {
-      isMounted = false
+    const handleDeleteRoom = async (id: string) => {
+        if (!window.confirm("Delete this room?")) return;
+        try {
+            await removeRoomMutation(id);
+            setRooms(prev => prev.filter(r => r._id !== id));
+        } catch (e) {
+            console.error("Error deleting room:", e);
+            alert("Failed to delete room");
+        }
+    };
+
+    const currentUserId = getUserId();
+
+    return (
+        <>
+            <Modal open={showPopup} onClose={handleClosePopup}>
+                <CreateRoomPopup
+                    onClose={handleClosePopup}
+                    onSuccess={handleRoomCreated}
+                />
+            </Modal>
+            <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
+                <Link to="/profile" style={{ textDecoration: 'none', position: 'fixed', top: 16, left: 16, zIndex: 10 }}>
+                    <Button variant="contained" color="secondary" startIcon={<SettingsIcon />}>
+                        Settings
+                    </Button>
+                </Link>
+                <Box sx={{ position: 'fixed', top: 16, right: 16, zIndex: 10 }}>
+                    <LogoutButton />
+                </Box>
+                <Container maxWidth="md">
+                    <Stack gap={"20px"}>
+                        {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
+                        {roomsError && <Typography color="error">{roomsError}</Typography>}
+                        {rooms.map((room) => (
+                            <Room
+                                key={room._id}
+                                roomId={room._id}
+                                roomName={room.name}
+                                canDelete={room.createdBy === currentUserId}
+                                onDelete={handleDeleteRoom}
+                            />
+                        ))}
+                    </Stack>
+                </Container>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 10 }}
+                    onClick={() => setShowPopup(true)}
+                >
+                    Create Room
+                </Button>
+            </Box>
+        </>
+    )
+}
+
+function getUserId(): string | null {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    try {
+        const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(base64)).userId;
+    } catch {
+        return null;
     }
-  }, [])
-
-  const handleClosePopup = () => {
-    setShowPopup(false)
-  }
-
-  const handleRoomCreated = (roomId: string) => {
-    console.log("Room created successfully, navigating to chat with room ID:", roomId)
-    navigate(`/chat/${roomId}`)
-  }
-
-  return (
-    <>
-      <Logo></Logo>
-      <Modal open={showPopup} onClose={handleClosePopup}>
-        <CreateRoomPopup
-          onClose={handleClosePopup}
-          onSuccess={handleRoomCreated}
-        />
-      </Modal>
-      <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-        <Link to="/profile" style={{ textDecoration: 'none', position: 'fixed', top: 16, left: 16 }}>
-          <Button variant="contained" color="secondary" startIcon={<SettingsIcon />}>
-            Settings
-          </Button>
-        </Link>
-        <Box sx={{ position: 'fixed', top: 16, right: 16 }}>
-          <LogoutButton />
-        </Box>
-        <Container maxWidth="md">
-          <Stack gap={"20px"} margin={"20px"}>
-            {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
-            {roomsError && <Typography color="error">{roomsError}</Typography>}
-            {rooms.map((room) => (
-              <Room key={room._id} roomId={room._id} roomName={room.name} num_users={1} room_size={8} />
-            ))}
-          </Stack>
-        </Container>
-        <Button
-          variant="contained"
-          color="secondary"
-          sx={{ position: 'fixed', bottom: 16, right: 16 }}
-          onClick={() => setShowPopup(true)}
-        >
-          Create Room
-        </Button>
-      </Box>
-    </>
-  )
 }
 
 export default Rooms
