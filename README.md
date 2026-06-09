@@ -19,8 +19,9 @@ Copy the `.env.example` file, rename it to `.env`, and add the required keys.
 _Make sure that the backend is also running._
 
 ## Testing
-Tests are ran using the Playwright library and can be found in the `./e2e` folder.  
-If you'd like to tweak the configuration (add more browsers, ...), check the `./playwright.config.ts` file.
+Tests are ran using the Playwright library and can be found in the `./e2e` folder.
+Run `npm run test` to start the testing procedure.
+_If you'd like to tweak the configuration (add more browsers, ...), check the `./playwright.config.ts` file._
 
 ## Hierarchy
 ```py
