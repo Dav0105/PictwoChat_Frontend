@@ -19,6 +19,8 @@ import {
   type MessageItem,
 } from "../graphql/chat";
 
+import enterRoomSound from "../assets/sounds/enter_room.mp3"
+
 // userId extrait du token JWT (payload = 2e segment, encodé en base64)
 function getUserId(): string | null {
   const token = localStorage.getItem("token");
@@ -129,6 +131,14 @@ function Chat() {
     prevCount.current = messages.length;
   }, [messages]);
 
+  // Play a sound when joining room
+  useEffect(() => {
+    const audio = new Audio(enterRoomSound);
+    setTimeout(() => {
+      audio.play();
+    }, 100);
+  }, []);
+
   return (
     <Grid container spacing={2} direction="column" height="100vh" sx={{ flexWrap: "nowrap" }}>
       <Link to="/rooms" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
@@ -150,7 +160,7 @@ function Chat() {
 
       <Grid>
         <Container maxWidth="md">
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: { xs: "100%", sm: "80%" }, mx: "auto", mt: "30px", paddingBottom: "10px"}}>
             <DrawBox width={"100%"} height={"200px"} canvasRef={canvasRef} />
 
             <TextField
