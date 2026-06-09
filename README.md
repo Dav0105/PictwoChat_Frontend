@@ -1,73 +1,39 @@
-# React + TypeScript + Vite
+# PictwoChat_Frontend
+<img src="public/PictwoChat Banner.png" alt="PictwoChat Banner"/>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small chatting app inspired by Nintendo DS Pictochat.
 
-Currently, two official plugins are available:
+## Setup
+### Prerequisites
+- Node.js (recommended 24+)
+- MongoDB instance (Atlas for example)
+- Giphy API Key
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### .env
+Copy the `.env.example` file, rename it to `.env`, and add the required keys.
 
-## React Compiler
+### Running
+1. Run `npm install` to install dependencies.
+2. Run `npm run dev` to run a local instance.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+_Make sure that the backend is also running._
 
-## Expanding the ESLint configuration
+## Testing
+Tests are ran using the Playwright library and can be found in the `./e2e` folder.  
+If you'd like to tweak the configuration (add more browsers, ...), check the `./playwright.config.ts` file.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Hierarchy
+```py
+📁 <root>
+├── 📁 e2e                  # Playwright test files 
+├── 📁 public               # Public ressources (such as the favicon) 
+├── 📁 src                  
+│   ├── 📄 App.tsx          # Main entry point of the app
+│   ├── 📄 theme.ts         # Theme configuration shared across the app (colors, ...)
+│   ├── 📁 components       # Components that are reused in multiple pages.
+│   ├── 📁 graphql          # GraphQL queries/mutations
+│   ├── 📁 lib              # Libraries configurations (Apollo Client, ...)
+│   └── 📁 pages            # Pages of the app
+├── 📄 playwright.config.ts # Configuration file for e2e tests
+└── 📄 README.md            # The file you are literally looking at right now.
 ```
