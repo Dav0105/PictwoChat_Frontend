@@ -20,6 +20,7 @@ type RoomProps = {
 type RoomListItem = {
     _id: string
     name: string
+    createdBy?: string
 }
 
 // Create RoomPop up
@@ -96,12 +97,10 @@ function CreateRoomPopup({ onClose, onSuccess }: { onClose: () => void; onSucces
     )
 }
 
-function Room({ roomId, roomName, num_users, room_size, onDelete }: RoomProps & { roomId: string; onDelete: (id: string) => void }) {
-
+function Room({ roomId, roomName, canDelete, onDelete }: { roomId: string; roomName: string; canDelete: boolean; onDelete: (id: string) => void }) {
     return (
         <Box color={"white"} sx={{
             width: '400px',
-            // height: '100px',
             backgroundColor: 'white',
             border: '2px solid #1a1a1a',
             padding: '10px',
@@ -109,25 +108,17 @@ function Room({ roomId, roomName, num_users, room_size, onDelete }: RoomProps & 
             boxShadow: '3px 3px 0px #1a1a1a',
             mx: 'auto',
         }} >
-
             <Typography variant="body1" color="black">{roomName}</Typography>
-
-            <Box display={'flex'}>
-                <Box sx={{ display: 'flex', marginTop: 'auto', marginBottom: 'auto', marginRight: 'auto' }}>
-                    <Person color="disabled" />
-                    <Typography variant="subtitle1" color="black">{num_users}/{room_size}</Typography>
-                </Box>
-
-                <Box display={'flex'} justifyContent={'right'}>
-                    <Link to={`/chat/${roomId}`}>
-                        <Button variant="contained" color="secondary">Join</Button>
-                    </Link>
+            <Box display={'flex'} justifyContent={'flex-end'} gap={1}>
+                <Link to={`/chat/${roomId}`}>
+                    <Button variant="contained" color="secondary">Join</Button>
+                </Link>
+                {canDelete && (
                     <Button variant="contained" color="error" onClick={() => onDelete(roomId)}>
                         <DeleteIcon />
                     </Button>
-                </Box>
+                )}
             </Box>
-
         </Box>
     )
 }
@@ -185,6 +176,19 @@ function Rooms() {
         navigate(`/chat/${roomId}`)
     }
 
+    const handleDeleteRoom = async (id: string) => {
+        if (!window.confirm("Delete this room?")) return;
+        try {
+            await removeRoomMutation(id);
+            setRooms(prev => prev.filter(r => r._id !== id));
+        } catch (e) {
+            console.error("Error deleting room:", e);
+            alert("Failed to delete room");
+        }
+    };
+
+    const currentUserId = getUserId();
+
     return (
         <>
             <Modal open={showPopup} onClose={handleClosePopup}>
@@ -207,7 +211,13 @@ function Rooms() {
                         {isLoadingRooms && <Typography color="black">Loading rooms...</Typography>}
                         {roomsError && <Typography color="error">{roomsError}</Typography>}
                         {rooms.map((room) => (
-                            <Room key={room._id} roomId={room._id} roomName={room.name} num_users={1} room_size={8} />
+                            <Room
+                                key={room._id}
+                                roomId={room._id}
+                                roomName={room.name}
+                                canDelete={room.createdBy === currentUserId}
+                                onDelete={handleDeleteRoom}
+                            />
                         ))}
                     </Stack>
                 </Container>
@@ -222,6 +232,17 @@ function Rooms() {
             </Box>
         </>
     )
+}
+
+function getUserId(): string | null {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    try {
+        const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(base64)).userId;
+    } catch {
+        return null;
+    }
 }
 
 export default Rooms
