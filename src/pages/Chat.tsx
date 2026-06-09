@@ -33,17 +33,22 @@ function getUserId(): string | null {
 function Msg({ username, pfp, children }: { username?: string; pfp?: string; children?: React.ReactNode }) {
   return (
     <Box sx={{
-      width: '400px', backgroundColor: 'white', border: '2px solid #1a1a1a',
+      width: '400px',
+      backgroundColor: 'white',
+      border: '2px solid #1a1a1a',
       borderRadius: '8px 6px 10px 7px / 7px 10px 6px 9px',
-      boxShadow: '3px 3px 0px #1a1a1a', mx: 'auto', mb: 1,
+      boxShadow: '3px 3px 0px #1a1a1a',
+      mx: 'auto',
+      mb: 1,
+      p: 1.5,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
         <Avatar src={pfp} sx={{ width: 28, height: 28 }}>
           {username?.[0]?.toUpperCase()}
         </Avatar>
-        <p style={{ color: "black" }}>{username}</p>
-      </div>
-      <p style={{ color: "black" }}>{children}</p>
+        <Typography sx={{ color: "black", fontWeight: 600 }}>{username}</Typography>
+      </Box>
+      <Box sx={{ color: "black", wordBreak: "break-word" }}>{children}</Box>
     </Box>
   );
 }
@@ -136,7 +141,7 @@ function Chat() {
           {messages.map((msg) => (
             <Msg key={msg._id} username={msg.user?.username} pfp={msg.user?.pfp}>
               {msg.text}
-              {msg.image && <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" }} />}
+              {msg.image && <img src={msg.image} alt="drawing" style={{ maxWidth: "100%", display: "block" , maxHeight: 250, margin: "8px auto 0", borderRadius: 8,}} />}
             </Msg>
           ))}
           <div ref={bottomRef} />
