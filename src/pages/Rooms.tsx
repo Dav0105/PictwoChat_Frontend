@@ -198,12 +198,12 @@ function Rooms() {
                 />
             </Modal>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-                <Link to="/profile" style={{ textDecoration: 'none', position: 'absolute', top: 16, left: 16 }}>
+                <Link to="/profile" style={{ textDecoration: 'none', position: 'fixed', top: 16, left: 16, zIndex: 10 }}>
                     <Button variant="contained" color="secondary" startIcon={<SettingsIcon />}>
                         Settings
                     </Button>
                 </Link>
-                <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                <Box sx={{ position: 'fixed', top: 16, right: 16, zIndex: 10 }}>
                     <LogoutButton />
                 </Box>
                 <Container maxWidth="md">
@@ -224,7 +224,7 @@ function Rooms() {
                 <Button
                     variant="contained"
                     color="secondary"
-                    sx={{ position: 'absolute', bottom: 16, right: 16 }}
+                    sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 10 }}
                     onClick={() => setShowPopup(true)}
                 >
                     Create Room
