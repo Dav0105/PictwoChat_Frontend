@@ -1,5 +1,5 @@
 import { ReactSketchCanvas, type ReactSketchCanvasRef } from "react-sketch-canvas";
-import { Box, Button, Icon } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { useRef, useState, type CSSProperties } from "react";
 import ModeIcon from '@mui/icons-material/Mode';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -35,7 +35,7 @@ function DrawBox({ width = "500px", height = "450px", color = '#000000', display
     }
 
     const savedPressed = async () => {
-        let base64data = await canvasRef.current?.exportImage("png")
+        const base64data = await canvasRef.current?.exportImage("png")
         console.log(base64data)
         if (base64data) {
             // Process base64data

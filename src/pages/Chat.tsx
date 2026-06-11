@@ -4,7 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import DrawBox from "../components/DrawBox";
 import GifPicker from "../components/GifPicker";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Person } from "@mui/icons-material";
 import Logo from "../components/Logo";
 import { useEffect, useRef, useState } from "react";
 import type { ReactSketchCanvasRef } from "react-sketch-canvas";

@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import DrawBox from '../components/DrawBox'
 import Logo from '../components/Logo'
 
-const title: string = "PictwoChat"
-
 function Home() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
